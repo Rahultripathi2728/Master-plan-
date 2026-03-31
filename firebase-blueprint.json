@@ -1,0 +1,80 @@
+{
+  "entities": {
+    "UserConfig": {
+      "title": "User Configuration",
+      "description": "Stores the master plan configuration for a user",
+      "type": "object",
+      "properties": {
+        "semesterType": {
+          "type": "string",
+          "enum": ["odd", "even"],
+          "description": "The current semester cycle"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date",
+          "description": "The academic start date"
+        },
+        "planMode": {
+          "type": "string",
+          "enum": ["blank", "auto", "custom"],
+          "description": "The planning mode"
+        },
+        "holidays": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string", "format": "date" },
+              "name": { "type": "string" }
+            },
+            "required": ["date", "name"]
+          },
+          "description": "List of holidays"
+        },
+        "customBlocks": {
+          "type": "object",
+          "description": "Custom schedule blocks indexed by semester number",
+          "properties": {
+            "1": { "$ref": "CustomBlocks" },
+            "2": { "$ref": "CustomBlocks" },
+            "3": { "$ref": "CustomBlocks" },
+            "4": { "$ref": "CustomBlocks" },
+            "5": { "$ref": "CustomBlocks" },
+            "6": { "$ref": "CustomBlocks" },
+            "7": { "$ref": "CustomBlocks" },
+            "8": { "$ref": "CustomBlocks" }
+          }
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["semesterType", "startDate", "planMode", "holidays", "customBlocks"]
+    },
+    "CustomBlocks": {
+      "title": "Custom Blocks",
+      "description": "Array of custom schedule blocks",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "enum": ["Theory", "Lab", "Clinical", "Co-Curricular", "Exam", "Vacation"] },
+          "startDate": { "type": "string", "format": "date" },
+          "endDate": { "type": "string", "format": "date" },
+          "hoursPerDay": { "type": "integer" }
+        },
+        "required": ["id", "type", "startDate", "endDate", "hoursPerDay"]
+      }
+    }
+  },
+  "firestore": {
+    "/userConfigs/{userId}": {
+      "schema": "UserConfig",
+      "description": "User-specific master plan configuration"
+    }
+  }
+}

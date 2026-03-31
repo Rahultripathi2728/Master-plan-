@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: userConfigs
+    // Document ID: {userId}
+    // Fields:
+    //   - semesterType: string (required, enum: ['odd', 'even'])
+    //   - startDate: string (required, format: YYYY-MM-DD)
+    //   - planMode: string (required, enum: ['blank', 'auto', 'custom'])
+    //   - holidays: list of objects (required, fields: date, name)
+    //   - customBlocks: map of lists (required, keys: '1'-'8', fields: id, type, startDate, endDate, hoursPerDay)
+    //   - updatedAt: timestamp (optional)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string && dateStr.matches("^\\d{4}-\\d{2}-\\d{2}$");
+    }
+
+    function isValidCustomBlock(block) {
+      return block is map &&
+             block.keys().hasAll(['id', 'type', 'startDate', 'endDate', 'hoursPerDay']) &&
+             block.id is string &&
+             block.type in ['Theory', 'Lab', 'Clinical', 'Co-Curricular', 'Exam', 'Vacation'] &&
+             isValidDateString(block.startDate) &&
+             isValidDateString(block.endDate) &&
+             block.hoursPerDay is int && block.hoursPerDay >= 0 && block.hoursPerDay <= 24;
+    }
+
+    function isValidUserConfig(data) {
+      return hasRequiredFields(['semesterType', 'startDate', 'planMode', 'holidays', 'customBlocks']) &&
+             hasOnlyAllowedFields(['semesterType', 'startDate', 'planMode', 'holidays', 'customBlocks', 'updatedAt']) &&
+             data.semesterType in ['odd', 'even'] &&
+             isValidDateString(data.startDate) &&
+             data.planMode in ['blank', 'auto', 'custom'] &&
+             data.holidays is list &&
+             data.customBlocks is map;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /userConfigs/{userId} {
+      // Users can only read and write their own configuration
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUserConfig(request.resource.data);
+      allow update: if isOwner(userId) && isValidUserConfig(request.resource.data);
+      allow delete: if isOwner(userId);
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
