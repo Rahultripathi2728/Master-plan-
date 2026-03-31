@@ -783,14 +783,14 @@ export default function App() {
       >
         <div className="min-w-[1000px] bg-white p-4 md:p-8 shadow-2xl border border-gray-200 rounded-xl" id="master-plan-content">
           {/* Detailed Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-            <div className="flex-1 text-left space-y-1">
+          <div className="relative mb-8 flex flex-col items-center">
+            <div className="text-center space-y-1">
               <h1 className="text-xl md:text-2xl font-bold uppercase tracking-tight">Graphic Era College of Nursing</h1>
               <h2 className="text-lg md:text-xl font-bold text-gray-600">Graphic Era Hill University, Bhimtal Campus</h2>
               <h3 className="text-base md:text-lg font-black text-[#ED7D31] uppercase tracking-widest">Master Plan - B.Sc. Nursing {semesterType.toUpperCase()} Semesters</h3>
               <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">Academic Session {new Date(startDate).getFullYear()} - {new Date(startDate).getFullYear() + 1}</p>
             </div>
-            <div className="flex gap-3 no-print items-center self-end md:self-auto">
+            <div className="md:absolute md:right-0 md:top-0 flex gap-3 no-print items-center mt-4 md:mt-0">
               <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-xl">
                 <span className="text-[10px] font-black uppercase tracking-widest px-2 text-gray-500">Filter:</span>
                 <select 
@@ -817,41 +817,41 @@ export default function App() {
             <table className="w-full border-collapse table-fixed text-xs">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="border border-black p-1 md:p-2 text-xs font-bold w-16 md:w-24">Month</th>
+                  <th className="border border-black p-1 md:p-2 text-xs font-bold w-16 md:w-24 text-center align-middle">Month</th>
                   {monthHeaders.map((m, i) => (
-                    <th key={i} colSpan={m.weekCount} className="border border-black p-1 text-xs font-bold">
+                    <th key={i} colSpan={m.weekCount} className="border border-black p-1 text-xs font-bold text-center align-middle">
                       {m.name}
                     </th>
                   ))}
                 </tr>
                 <tr className="bg-gray-50">
-                  <th className="border border-black p-1 text-[10px] md:text-xs font-bold">Weeks</th>
+                  <th className="border border-black p-1 text-[10px] md:text-xs font-bold text-center align-middle">Weeks</th>
                   {weeksArr.map(w => (
-                    <th key={w} className="border border-black p-0.5 md:p-1 text-[10px] md:text-xs font-bold w-6 md:w-10">{w}</th>
+                    <th key={w} className="border border-black p-0.5 md:p-1 text-[10px] md:text-xs font-bold w-6 md:w-10 text-center align-middle">{w}</th>
                   ))}
                 </tr>
                 {masterPlanFilter !== 'all' && (
                   <>
                     <tr className="bg-gray-50">
-                      <th className="border border-black p-1 text-[10px] font-bold">From</th>
+                      <th className="border border-black p-1 text-[10px] font-bold text-center align-middle">From</th>
                       {weeksArr.map((_, i) => (
-                        <th key={i} className="border border-black p-0.5 text-[8px] md:text-[9px] font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+                        <th key={i} className="border border-black p-0.5 text-[8px] md:text-[9px] font-bold text-center align-middle whitespace-nowrap overflow-hidden text-ellipsis">
                           {getWeekRange(semesters.indexOf(parseInt(masterPlanFilter)), i).from}
                         </th>
                       ))}
                     </tr>
                     <tr className="bg-gray-50">
-                      <th className="border border-black p-1 text-[10px] font-bold">To</th>
+                      <th className="border border-black p-1 text-[10px] font-bold text-center align-middle">To</th>
                       {weeksArr.map((_, i) => (
-                        <th key={i} className="border border-black p-0.5 text-[8px] md:text-[9px] font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+                        <th key={i} className="border border-black p-0.5 text-[8px] md:text-[9px] font-bold text-center align-middle whitespace-nowrap overflow-hidden text-ellipsis">
                           {getWeekRange(semesters.indexOf(parseInt(masterPlanFilter)), i).to}
                         </th>
                       ))}
                     </tr>
                     <tr className="bg-gray-50">
-                      <th className="border border-black p-1 text-[10px] font-bold">Days</th>
+                      <th className="border border-black p-1 text-[10px] font-bold text-center align-middle">Days</th>
                       {weeksArr.map((_, i) => (
-                        <th key={i} className="border border-black p-0.5 text-[8px] md:text-[9px] font-medium">
+                        <th key={i} className="border border-black p-0.5 text-[8px] md:text-[9px] font-bold text-center align-middle">
                           {getWeekStats(semesters.indexOf(parseInt(masterPlanFilter)), i).workingDays}
                         </th>
                       ))}
@@ -865,7 +865,7 @@ export default function App() {
                   const mergedBlocks = getMergedBlocks(sIdx);
                   return (
                     <tr key={sem}>
-                      <td className="border border-black p-1 md:p-2 text-center font-bold text-xs md:text-sm bg-white relative h-32 md:h-48 w-8 md:w-12">
+                      <td className="border border-black p-1 md:p-2 text-center font-bold text-xs md:text-sm bg-white relative h-48 md:h-72 w-8 md:w-12 align-middle">
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest whitespace-nowrap block" style={{ transform: 'rotate(-90deg)', width: 'max-content' }}>
                             B.Sc. Nursing {sem}th Sem
@@ -873,10 +873,10 @@ export default function App() {
                         </div>
                       </td>
                       {mergedBlocks.length === 0 ? (
-                        <td colSpan={26} className="border border-black p-2 md:p-4 text-center text-gray-400 font-bold bg-gray-50 h-32 md:h-48">
+                        <td colSpan={26} className="border border-black p-2 md:p-4 text-center text-gray-400 font-bold bg-gray-50 h-48 md:h-72 align-middle">
                           <div className="flex flex-col items-center justify-center h-full">
-                            <span className="text-sm md:text-base mb-1 md:mb-2">Template Not Provided</span>
-                            <span className="text-[10px] md:text-xs font-normal">Please provide a master plan template for Semester {sem}</span>
+                            <span className="text-sm md:text-base mb-1 md:mb-2 font-bold">Template Not Provided</span>
+                            <span className="text-[10px] md:text-xs font-bold">Please provide a master plan template for Semester {sem}</span>
                           </div>
                         </td>
                       ) : (
@@ -903,11 +903,11 @@ export default function App() {
                         };
 
                         // Dynamic font size based on block width (length in weeks)
-                        const fontSize = block.length === 1 ? 'text-[5px]' : block.length === 2 ? 'text-[6px]' : 'text-[7px] md:text-[8px]';
-                        const subFontSize = block.length === 1 ? 'text-[4px]' : 'text-[5px] md:text-[6px]';
+                        const fontSize = block.length === 1 ? 'text-[6px]' : block.length === 2 ? 'text-[8px]' : 'text-[10px] md:text-xs';
+                        const subFontSize = block.length === 1 ? 'text-[5px]' : 'text-[7px] md:text-[10px]';
 
                         return (
-                          <td key={bIdx} colSpan={block.length} className="border border-black p-0 relative h-32 md:h-48 overflow-hidden">
+                          <td key={bIdx} colSpan={block.length} className="border border-black p-0 relative h-48 md:h-72 overflow-hidden align-middle">
                             <div className="flex flex-col h-full w-full">
                               {isTheoryPhase ? (
                                 <>
@@ -1031,8 +1031,7 @@ export default function App() {
 
           {/* Consolidated Summary & Keys Section */}
           <div className="mt-8">
-            <h3 className="text-base md:text-lg font-bold text-center underline mb-4">Consolidated Academic Summary & Legend</h3>
-            <div className="flex flex-col lg:flex-row gap-4 items-stretch">
+            <div className="flex flex-row gap-4 items-stretch">
               {/* Summary Table (Left) */}
               <div className="flex-[5] min-w-0 overflow-x-auto">
                 <table className="w-full border-collapse border-2 border-black text-[9px] md:text-[11px]">
@@ -1042,7 +1041,6 @@ export default function App() {
                       <th rowSpan={2} className="border border-black p-1 md:p-1.5 text-center font-bold">Subject</th>
                       <th colSpan={3} className="border border-black p-0.5 md:p-1 text-center font-bold">Stipulated Hours</th>
                       <th colSpan={3} className="border border-black p-0.5 md:p-1 text-center font-bold">Delivered Hours</th>
-                      <th rowSpan={2} className="border border-black p-1 md:p-1.5 text-center font-bold">Status</th>
                     </tr>
                     <tr className="bg-gray-100">
                       <th className="border border-black p-0.5 md:p-1 text-center font-bold text-[8px] md:text-[10px]">Theory</th>
@@ -1071,39 +1069,25 @@ export default function App() {
                                     {sem}th Sem
                                   </td>
                                 )}
-                                <td className="border border-black p-1 md:p-1.5 font-medium">{s.subjectName}</td>
-                                <td className="border border-black p-1 md:p-1.5 text-center">{stip.theoryHours}</td>
-                                <td className="border border-black p-1 md:p-1.5 text-center">{stip.labHours}</td>
-                                <td className="border border-black p-1 md:p-1.5 text-center">{stip.clinicalHours}</td>
-                                <td className="border border-black p-1 md:p-1.5 text-center font-bold">{s.scheduledTheory}</td>
-                                <td className="border border-black p-1 md:p-1.5 text-center font-bold">{s.scheduledLab}</td>
-                                <td className="border border-black p-1 md:p-1.5 text-center font-bold">{s.scheduledClinical}</td>
-                                <td className="border border-black p-1 md:p-1.5 text-center">
-                                  {(() => {
-                                    const totalScheduled = s.scheduledTheory + s.scheduledLab + s.scheduledClinical;
-                                    const totalRequired = s.totalTheory + s.totalLab + s.totalClinical;
-                                    const percentage = totalRequired > 0 ? Math.round((totalScheduled / totalRequired) * 100) : 100;
-                                    
-                                    if (s.remainingTheory === 0 && s.remainingLab === 0 && s.remainingClinical === 0) {
-                                      return <span className="text-green-600 font-bold">✓ {percentage}%</span>;
-                                    } else {
-                                      return <span className="text-red-600 font-bold">{percentage}%</span>;
-                                    }
-                                  })()}
-                                </td>
+                                <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{s.subjectName}</td>
+                                <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{stip.theoryHours}</td>
+                                <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{stip.labHours}</td>
+                                <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{stip.clinicalHours}</td>
+                                <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{s.scheduledTheory}</td>
+                                <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{s.scheduledLab}</td>
+                                <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{s.scheduledClinical}</td>
                               </tr>
                             );
                           })}
                           <tr className="bg-purple-50 font-bold">
-                            <td className="border border-black p-1 md:p-1.5 text-center uppercase">CO-CURRICULAR / ORIENTATION</td>
-                            <td className="border border-black p-1 md:p-1.5 text-center">-</td>
-                            <td className="border border-black p-1 md:p-1.5 text-center">-</td>
-                            <td className="border border-black p-1 md:p-1.5 text-center">-</td>
-                            <td className="border border-black p-1 md:p-1.5 text-center" colSpan={3}>{stats.totalCA + stats.totalOrientation} hrs</td>
-                            <td className="border border-black p-1 md:p-1.5 text-center">-</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center uppercase align-middle">CO-CURRICULAR / ORIENTATION</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center align-middle">-</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center align-middle">-</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center align-middle">-</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center align-middle" colSpan={3}>{stats.totalCA + stats.totalOrientation} hrs</td>
                           </tr>
                           <tr className="bg-blue-50 font-bold">
-                            <td className="border border-black p-1 md:p-1.5 text-center uppercase">SEM {sem} TOTAL</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center uppercase align-middle">SEM {sem} TOTAL</td>
                             {(() => {
                               const stipTotal = semSubjects.reduce((acc, s) => ({
                                 t: acc.t + s.theoryHours,
@@ -1113,13 +1097,12 @@ export default function App() {
                               
                               return (
                                 <>
-                                  <td className="border border-black p-1 md:p-1.5 text-center">{stipTotal.t}</td>
-                                  <td className="border border-black p-1 md:p-1.5 text-center">{stipTotal.l}</td>
-                                  <td className="border border-black p-1 md:p-1.5 text-center">{stipTotal.c}</td>
-                                  <td className="border border-black p-1 md:p-1.5 text-center">{stats.totalTheory}</td>
-                                  <td className="border border-black p-1 md:p-1.5 text-center">{stats.totalLab}</td>
-                                  <td className="border border-black p-1 md:p-1.5 text-center">{stats.totalClinical}</td>
-                                  <td className="border border-black p-1 md:p-1.5 text-center">-</td>
+                                  <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{stipTotal.t}</td>
+                                  <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{stipTotal.l}</td>
+                                  <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{stipTotal.c}</td>
+                                  <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{stats.totalTheory}</td>
+                                  <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{stats.totalLab}</td>
+                                  <td className="border border-black p-1 md:p-1.5 font-bold text-center align-middle">{stats.totalClinical}</td>
                                 </>
                               );
                             })()}
@@ -1133,7 +1116,7 @@ export default function App() {
 
               {/* Color Key (Right) */}
               <div className="flex-[1.5] border-2 border-black p-2 bg-gray-50 rounded-lg min-w-[180px]">
-                <h4 className="text-[11px] font-black uppercase tracking-widest mb-2 border-b border-black pb-1">Color Legend</h4>
+                <h4 className="text-[11px] font-black uppercase tracking-widest mb-2 border-b border-black pb-1">Key</h4>
                 <div className="grid grid-cols-1 gap-1.5">
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-[#FF99CC] border border-black shrink-0"></div>
