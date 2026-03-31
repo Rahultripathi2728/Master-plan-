@@ -12,7 +12,10 @@ import {
   Menu,
   LogIn,
   LogOut,
-  Cloud
+  Cloud,
+  GraduationCap,
+  Settings,
+  CalendarDays
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
@@ -74,68 +77,51 @@ class ErrorBoundary extends Component<{ children: React.ReactNode }, { hasError:
   }
 }
 
-const Header = ({ title, onMenuClick, onReset }: { title: string, onMenuClick?: () => void, onReset?: () => void }) => (
-  <header className="bg-[#141414] text-white p-4 sticky top-0 z-50 flex items-center justify-between shadow-md no-print">
-    <div className="flex items-center gap-3">
-      {onMenuClick && (
-        <button onClick={onMenuClick} className="lg:hidden p-1 hover:bg-white/10 rounded">
-          <Menu size={24} />
-        </button>
-      )}
-      <h1 className="text-xl font-bold tracking-tight uppercase">Graphic Era <span className="text-[#ED7D31]">Master Plan</span></h1>
-    </div>
-    <div className="hidden md:flex items-center gap-6">
-      <div className="text-sm opacity-70 font-medium">{title}</div>
-      
-      {onReset && (
-        <button 
-          onClick={onReset}
-          className="text-xs bg-red-500/20 text-red-400 hover:bg-red-500/30 px-3 py-1.5 rounded-md font-bold transition-colors"
-        >
-          Reset Data
-        </button>
-      )}
-    </div>
-  </header>
-);
+// --- Main App ---
 
-const StepIndicator = ({ currentStep }: { currentStep: number }) => {
-  const steps = [
-    { id: 1, name: 'Setup', icon: LayoutDashboard },
-    { id: 2, name: 'Master Plan', icon: BarChart3 },
-  ];
-
+const DashboardHeader = ({ step, semesterType, startDate }: { step: number, semesterType: string, startDate: string }) => {
+  const sessionYear = new Date(startDate).getFullYear();
+  
   return (
-    <div className="flex items-center justify-center gap-2 md:gap-8 mb-8 overflow-x-auto py-2 px-4 no-scrollbar no-print">
-      {steps.map((step, idx) => {
-        const Icon = step.icon;
-        const isActive = currentStep === step.id;
-        const isPast = currentStep > step.id;
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm no-print">
+      <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        {/* Left Side: Logo & Title */}
+        <div className="flex items-center gap-3">
+          <div className="bg-[#141414] text-white p-2.5 rounded-xl shadow-md">
+            <GraduationCap size={24} />
+          </div>
+          <div>
+            <h1 className="text-xl font-black text-gray-900 tracking-tight leading-none mb-1">
+              GEHU MASTER PLAN
+            </h1>
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+              Curriculum Management System
+            </p>
+          </div>
+        </div>
 
-        return (
-          <React.Fragment key={step.id}>
-            <div className="flex flex-col items-center gap-1 min-w-fit">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                isActive ? 'bg-[#ED7D31] text-white scale-110 shadow-lg' : 
-                isPast ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'
-              }`}>
-                {isPast ? <CheckCircle2 size={20} /> : <Icon size={20} />}
-              </div>
-              <span className={`text-[10px] uppercase font-bold tracking-wider ${isActive ? 'text-[#ED7D31]' : 'text-gray-400'}`}>
-                {step.name}
-              </span>
+        {/* Right Side: Status / Info */}
+        <div className="flex items-center gap-3">
+          {step === 1 ? (
+            <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
+              <Settings size={14} className="text-gray-500" />
+              <span className="text-xs font-bold text-gray-600 uppercase tracking-wider">Setup Phase</span>
             </div>
-            {idx < steps.length - 1 && (
-              <div className={`h-[2px] w-4 md:w-12 mb-4 ${isPast ? 'bg-green-500' : 'bg-gray-200'}`} />
-            )}
-          </React.Fragment>
-        );
-      })}
-    </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100 text-[#ED7D31]">
+                <CalendarDays size={14} />
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  {semesterType} Sem • {sessionYear}-{sessionYear + 1}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
   );
 };
-
-// --- Main App ---
 
 export default function App() {
   const [step, setStep] = useState(1);
@@ -184,8 +170,6 @@ export default function App() {
 
   const [newHoliday, setNewHoliday] = useState({ date: '', name: '' });
   const [masterPlanFilter, setMasterPlanFilter] = useState<string>('all');
-
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   // Derived Data
   const endDate = useMemo(() => {
@@ -301,7 +285,7 @@ export default function App() {
 
     try {
       const originalStyle = element.style.cssText;
-      element.style.width = '1400px'; 
+      element.style.width = '1000px'; 
       element.style.maxWidth = 'none';
       
       const canvas = await html2canvas(element, {
@@ -795,24 +779,24 @@ export default function App() {
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="p-4 space-y-8 overflow-x-auto"
+        className="p-2 md:p-4 space-y-8 overflow-x-auto"
       >
-        <div className="min-w-[1400px] bg-white p-8 shadow-2xl border border-gray-200" id="master-plan-content">
+        <div className="min-w-[1000px] bg-white p-4 md:p-8 shadow-2xl border border-gray-200 rounded-xl" id="master-plan-content">
           {/* Detailed Header */}
-          <div className="flex justify-between items-start mb-8">
-            <div className="flex-1 text-center space-y-1">
-              <h1 className="text-2xl font-bold uppercase tracking-tight">Graphic Era College of Nursing</h1>
-              <h2 className="text-xl font-bold text-gray-600">Graphic Era Hill University, Bhimtal Campus</h2>
-              <h3 className="text-lg font-black text-[#ED7D31] uppercase tracking-widest">Master Plan - B.Sc. Nursing {semesterType.toUpperCase()} Semesters</h3>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">Academic Session {new Date(startDate).getFullYear()} - {new Date(startDate).getFullYear() + 1}</p>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div className="flex-1 text-left space-y-1">
+              <h1 className="text-xl md:text-2xl font-bold uppercase tracking-tight">Graphic Era College of Nursing</h1>
+              <h2 className="text-lg md:text-xl font-bold text-gray-600">Graphic Era Hill University, Bhimtal Campus</h2>
+              <h3 className="text-base md:text-lg font-black text-[#ED7D31] uppercase tracking-widest">Master Plan - B.Sc. Nursing {semesterType.toUpperCase()} Semesters</h3>
+              <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">Academic Session {new Date(startDate).getFullYear()} - {new Date(startDate).getFullYear() + 1}</p>
             </div>
-            <div className="flex gap-3 no-print items-center">
+            <div className="flex gap-3 no-print items-center self-end md:self-auto">
               <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-xl">
                 <span className="text-[10px] font-black uppercase tracking-widest px-2 text-gray-500">Filter:</span>
                 <select 
                   value={masterPlanFilter}
                   onChange={(e) => setMasterPlanFilter(e.target.value)}
-                  className="bg-white border-none rounded-lg px-3 py-2 text-xs font-bold outline-none shadow-sm"
+                  className="bg-white border-none rounded-lg px-3 py-2 text-xs font-bold outline-none shadow-sm cursor-pointer"
                 >
                   <option value="all">All Semesters</option>
                   {semesters.map(s => (
@@ -829,45 +813,45 @@ export default function App() {
             </div>
           </div>
 
-          <div className="border-2 border-black overflow-hidden">
-            <table className="w-full border-collapse table-fixed">
+          <div className="border-2 border-black overflow-hidden rounded-lg">
+            <table className="w-full border-collapse table-fixed text-xs">
               <thead>
-                <tr className="bg-white">
-                  <th className="border border-black p-2 text-sm font-bold w-32">Month</th>
+                <tr className="bg-gray-50">
+                  <th className="border border-black p-1 md:p-2 text-xs font-bold w-16 md:w-24">Month</th>
                   {monthHeaders.map((m, i) => (
-                    <th key={i} colSpan={m.weekCount} className="border border-black p-2 text-sm font-bold">
+                    <th key={i} colSpan={m.weekCount} className="border border-black p-1 text-xs font-bold">
                       {m.name}
                     </th>
                   ))}
                 </tr>
-                <tr className="bg-white">
-                  <th className="border border-black p-1 text-sm font-bold">Weeks</th>
+                <tr className="bg-gray-50">
+                  <th className="border border-black p-1 text-[10px] md:text-xs font-bold">Weeks</th>
                   {weeksArr.map(w => (
-                    <th key={w} className="border border-black p-1 text-sm font-bold w-12">{w}</th>
+                    <th key={w} className="border border-black p-0.5 md:p-1 text-[10px] md:text-xs font-bold w-6 md:w-10">{w}</th>
                   ))}
                 </tr>
                 {masterPlanFilter !== 'all' && (
                   <>
-                    <tr className="bg-white">
-                      <th className="border border-black p-1 text-sm font-bold">From</th>
+                    <tr className="bg-gray-50">
+                      <th className="border border-black p-1 text-[10px] font-bold">From</th>
                       {weeksArr.map((_, i) => (
-                        <th key={i} className="border border-black p-1 text-sm font-bold">
+                        <th key={i} className="border border-black p-0.5 text-[8px] md:text-[9px] font-medium whitespace-nowrap overflow-hidden text-ellipsis">
                           {getWeekRange(semesters.indexOf(parseInt(masterPlanFilter)), i).from}
                         </th>
                       ))}
                     </tr>
-                    <tr className="bg-white">
-                      <th className="border border-black p-1 text-sm font-bold">To</th>
+                    <tr className="bg-gray-50">
+                      <th className="border border-black p-1 text-[10px] font-bold">To</th>
                       {weeksArr.map((_, i) => (
-                        <th key={i} className="border border-black p-1 text-sm font-bold">
+                        <th key={i} className="border border-black p-0.5 text-[8px] md:text-[9px] font-medium whitespace-nowrap overflow-hidden text-ellipsis">
                           {getWeekRange(semesters.indexOf(parseInt(masterPlanFilter)), i).to}
                         </th>
                       ))}
                     </tr>
-                    <tr className="bg-white">
-                      <th className="border border-black p-1 text-sm font-bold">Working Days</th>
+                    <tr className="bg-gray-50">
+                      <th className="border border-black p-1 text-[10px] font-bold">Days</th>
                       {weeksArr.map((_, i) => (
-                        <th key={i} className="border border-black p-1 text-sm font-bold">
+                        <th key={i} className="border border-black p-0.5 text-[8px] md:text-[9px] font-medium">
                           {getWeekStats(semesters.indexOf(parseInt(masterPlanFilter)), i).workingDays}
                         </th>
                       ))}
@@ -881,18 +865,18 @@ export default function App() {
                   const mergedBlocks = getMergedBlocks(sIdx);
                   return (
                     <tr key={sem}>
-                      <td className="border border-black p-4 text-center font-bold text-sm bg-white relative h-64 w-12">
+                      <td className="border border-black p-1 md:p-2 text-center font-bold text-xs md:text-sm bg-white relative h-32 md:h-48 w-8 md:w-12">
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-sm font-bold uppercase tracking-widest whitespace-nowrap block" style={{ transform: 'rotate(-90deg)', width: 'max-content' }}>
-                            B.Sc. Nursing {sem}th Semester
+                          <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest whitespace-nowrap block" style={{ transform: 'rotate(-90deg)', width: 'max-content' }}>
+                            B.Sc. Nursing {sem}th Sem
                           </span>
                         </div>
                       </td>
                       {mergedBlocks.length === 0 ? (
-                        <td colSpan={26} className="border border-black p-4 text-center text-gray-400 font-bold bg-gray-50 h-72">
+                        <td colSpan={26} className="border border-black p-2 md:p-4 text-center text-gray-400 font-bold bg-gray-50 h-32 md:h-48">
                           <div className="flex flex-col items-center justify-center h-full">
-                            <span className="text-lg mb-2">Template Not Provided</span>
-                            <span className="text-sm font-normal">Please provide a master plan template for Semester {sem}</span>
+                            <span className="text-sm md:text-base mb-1 md:mb-2">Template Not Provided</span>
+                            <span className="text-[10px] md:text-xs font-normal">Please provide a master plan template for Semester {sem}</span>
                           </div>
                         </td>
                       ) : (
@@ -908,22 +892,22 @@ export default function App() {
 
                         const renderMath = (total: number, days: number) => {
                           const roundedTotal = Math.round(total);
-                          if (days === 0 || roundedTotal === 0) return `${roundedTotal} hrs`;
+                          if (days === 0 || roundedTotal === 0) return `${roundedTotal}h`;
                           const exact = total / days;
                           const hrsPerDay = Math.round(exact);
                           // If rounding leads to 0 but total > 0, show < 1 hr/day or just the total
                           if (hrsPerDay === 0 && roundedTotal > 0) {
-                            return `Total: ${roundedTotal} hrs (${days} days)`;
+                            return `${roundedTotal}h (${days}d)`;
                           }
-                          return `${hrsPerDay} hrs/day × ${days} days = ${roundedTotal} hrs`;
+                          return `${hrsPerDay}h/d × ${days}d = ${roundedTotal}h`;
                         };
 
                         // Dynamic font size based on block width (length in weeks)
-                        const fontSize = block.length === 1 ? 'text-[7px]' : block.length === 2 ? 'text-[8px]' : 'text-[10px]';
-                        const subFontSize = block.length === 1 ? 'text-[6px]' : 'text-[9px]';
+                        const fontSize = block.length === 1 ? 'text-[5px]' : block.length === 2 ? 'text-[6px]' : 'text-[7px] md:text-[8px]';
+                        const subFontSize = block.length === 1 ? 'text-[4px]' : 'text-[5px] md:text-[6px]';
 
                         return (
-                          <td key={bIdx} colSpan={block.length} className="border border-black p-0 relative h-72 overflow-hidden">
+                          <td key={bIdx} colSpan={block.length} className="border border-black p-0 relative h-32 md:h-48 overflow-hidden">
                             <div className="flex flex-col h-full w-full">
                               {isTheoryPhase ? (
                                 <>
@@ -1047,26 +1031,26 @@ export default function App() {
 
           {/* Consolidated Summary & Keys Section */}
           <div className="mt-8">
-            <h3 className="text-lg font-bold text-center underline mb-4">Consolidated Academic Summary & Legend</h3>
-            <div className="flex flex-row gap-4 items-stretch">
+            <h3 className="text-base md:text-lg font-bold text-center underline mb-4">Consolidated Academic Summary & Legend</h3>
+            <div className="flex flex-col lg:flex-row gap-4 items-stretch">
               {/* Summary Table (Left) */}
-              <div className="flex-[5] min-w-0">
-                <table className="w-full border-collapse border-2 border-black text-[11px]">
+              <div className="flex-[5] min-w-0 overflow-x-auto">
+                <table className="w-full border-collapse border-2 border-black text-[9px] md:text-[11px]">
                   <thead>
                     <tr className="bg-gray-100">
-                      <th rowSpan={2} className="border border-black p-1.5 text-center font-bold">Semester</th>
-                      <th rowSpan={2} className="border border-black p-1.5 text-center font-bold">Subject</th>
-                      <th colSpan={3} className="border border-black p-1 text-center font-bold">Stipulated Hours</th>
-                      <th colSpan={3} className="border border-black p-1 text-center font-bold">Delivered Hours</th>
+                      <th rowSpan={2} className="border border-black p-1 md:p-1.5 text-center font-bold">Semester</th>
+                      <th rowSpan={2} className="border border-black p-1 md:p-1.5 text-center font-bold">Subject</th>
+                      <th colSpan={3} className="border border-black p-0.5 md:p-1 text-center font-bold">Stipulated Hours</th>
+                      <th colSpan={3} className="border border-black p-0.5 md:p-1 text-center font-bold">Delivered Hours</th>
+                      <th rowSpan={2} className="border border-black p-1 md:p-1.5 text-center font-bold">Status</th>
                     </tr>
                     <tr className="bg-gray-100">
-                      <th className="border border-black p-1 text-center font-bold text-[10px]">Theory</th>
-                      <th className="border border-black p-1 text-center font-bold text-[10px]">Lab/Skill</th>
-                      <th className="border border-black p-1 text-center font-bold text-[10px]">Clinical</th>
-                      <th className="border border-black p-1 text-center font-bold text-[10px]">Theory</th>
-                      <th className="border border-black p-1 text-center font-bold text-[10px]">Lab/Skill</th>
-                      <th className="border border-black p-1 text-center font-bold text-[10px]">Clinical</th>
-                      <th className="border border-black p-1 text-center font-bold text-[10px]">Status</th>
+                      <th className="border border-black p-0.5 md:p-1 text-center font-bold text-[8px] md:text-[10px]">Theory</th>
+                      <th className="border border-black p-0.5 md:p-1 text-center font-bold text-[8px] md:text-[10px]">Lab/Skill</th>
+                      <th className="border border-black p-0.5 md:p-1 text-center font-bold text-[8px] md:text-[10px]">Clinical</th>
+                      <th className="border border-black p-0.5 md:p-1 text-center font-bold text-[8px] md:text-[10px]">Theory</th>
+                      <th className="border border-black p-0.5 md:p-1 text-center font-bold text-[8px] md:text-[10px]">Lab/Skill</th>
+                      <th className="border border-black p-0.5 md:p-1 text-center font-bold text-[8px] md:text-[10px]">Clinical</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1083,18 +1067,18 @@ export default function App() {
                             return (
                               <tr key={`${sem}-${s.subjectId}`}>
                                 {subIdx === 0 && (
-                                  <td rowSpan={stats.finalStats.length + 2} className="border border-black p-1.5 text-center font-bold bg-gray-50 align-middle">
+                                  <td rowSpan={stats.finalStats.length + 2} className="border border-black p-1 md:p-1.5 text-center font-bold bg-gray-50 align-middle">
                                     {sem}th Sem
                                   </td>
                                 )}
-                                <td className="border border-black p-1.5 font-medium">{s.subjectName}</td>
-                                <td className="border border-black p-1.5 text-center">{stip.theoryHours}</td>
-                                <td className="border border-black p-1.5 text-center">{stip.labHours}</td>
-                                <td className="border border-black p-1.5 text-center">{stip.clinicalHours}</td>
-                                <td className="border border-black p-1.5 text-center font-bold">{s.scheduledTheory}</td>
-                                <td className="border border-black p-1.5 text-center font-bold">{s.scheduledLab}</td>
-                                <td className="border border-black p-1.5 text-center font-bold">{s.scheduledClinical}</td>
-                                <td className="border border-black p-1.5 text-center">
+                                <td className="border border-black p-1 md:p-1.5 font-medium">{s.subjectName}</td>
+                                <td className="border border-black p-1 md:p-1.5 text-center">{stip.theoryHours}</td>
+                                <td className="border border-black p-1 md:p-1.5 text-center">{stip.labHours}</td>
+                                <td className="border border-black p-1 md:p-1.5 text-center">{stip.clinicalHours}</td>
+                                <td className="border border-black p-1 md:p-1.5 text-center font-bold">{s.scheduledTheory}</td>
+                                <td className="border border-black p-1 md:p-1.5 text-center font-bold">{s.scheduledLab}</td>
+                                <td className="border border-black p-1 md:p-1.5 text-center font-bold">{s.scheduledClinical}</td>
+                                <td className="border border-black p-1 md:p-1.5 text-center">
                                   {(() => {
                                     const totalScheduled = s.scheduledTheory + s.scheduledLab + s.scheduledClinical;
                                     const totalRequired = s.totalTheory + s.totalLab + s.totalClinical;
@@ -1111,14 +1095,15 @@ export default function App() {
                             );
                           })}
                           <tr className="bg-purple-50 font-bold">
-                            <td className="border border-black p-0.5 text-center uppercase">CO-CURRICULAR / ORIENTATION</td>
-                            <td className="border border-black p-0.5 text-center">-</td>
-                            <td className="border border-black p-0.5 text-center">-</td>
-                            <td className="border border-black p-0.5 text-center">-</td>
-                            <td className="border border-black p-0.5 text-center" colSpan={3}>{stats.totalCA + stats.totalOrientation} hrs</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center uppercase">CO-CURRICULAR / ORIENTATION</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center">-</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center">-</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center">-</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center" colSpan={3}>{stats.totalCA + stats.totalOrientation} hrs</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center">-</td>
                           </tr>
                           <tr className="bg-blue-50 font-bold">
-                            <td className="border border-black p-0.5 text-center uppercase">SEM {sem} TOTAL</td>
+                            <td className="border border-black p-1 md:p-1.5 text-center uppercase">SEM {sem} TOTAL</td>
                             {(() => {
                               const stipTotal = semSubjects.reduce((acc, s) => ({
                                 t: acc.t + s.theoryHours,
@@ -1128,12 +1113,13 @@ export default function App() {
                               
                               return (
                                 <>
-                                  <td className="border border-black p-0.5 text-center">{stipTotal.t}</td>
-                                  <td className="border border-black p-0.5 text-center">{stipTotal.l}</td>
-                                  <td className="border border-black p-0.5 text-center">{stipTotal.c}</td>
-                                  <td className="border border-black p-0.5 text-center">{stats.totalTheory}</td>
-                                  <td className="border border-black p-0.5 text-center">{stats.totalLab}</td>
-                                  <td className="border border-black p-0.5 text-center">{stats.totalClinical}</td>
+                                  <td className="border border-black p-1 md:p-1.5 text-center">{stipTotal.t}</td>
+                                  <td className="border border-black p-1 md:p-1.5 text-center">{stipTotal.l}</td>
+                                  <td className="border border-black p-1 md:p-1.5 text-center">{stipTotal.c}</td>
+                                  <td className="border border-black p-1 md:p-1.5 text-center">{stats.totalTheory}</td>
+                                  <td className="border border-black p-1 md:p-1.5 text-center">{stats.totalLab}</td>
+                                  <td className="border border-black p-1 md:p-1.5 text-center">{stats.totalClinical}</td>
+                                  <td className="border border-black p-1 md:p-1.5 text-center">-</td>
                                 </>
                               );
                             })()}
@@ -1215,66 +1201,17 @@ export default function App() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-[#f8f9fa] font-sans text-[#141414] selection:bg-[#ED7D31] selection:text-white">
-        <Header 
-          title={step === 1 ? 'Setup' : 'Master Plan'} 
-          onReset={() => setShowResetConfirm(true)}
-        />
-      
-      <main className="container mx-auto py-8">
-        <StepIndicator currentStep={step} />
-        
-        <AnimatePresence mode="wait">
-          {step === 1 && renderSetup()}
-          {step === 2 && renderMasterPlan()}
-        </AnimatePresence>
-      </main>
+        <DashboardHeader step={step} semesterType={semesterType} startDate={startDate} />
+        <main className="container mx-auto py-8">
+          <AnimatePresence mode="wait">
+            {step === 1 && renderSetup()}
+            {step === 2 && renderMasterPlan()}
+          </AnimatePresence>
+        </main>
 
       <footer className="py-8 text-center text-gray-400 text-xs font-bold uppercase tracking-[0.2em] opacity-50">
-        &copy; 2026 Graphic Era University • Academic Planning System
+        &copy; 2026 Graphic Era Hill University • Academic Planning System
       </footer>
-
-      {/* Reset Confirmation Modal */}
-      <AnimatePresence>
-        {showResetConfirm && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl"
-            >
-              <h3 className="text-xl font-bold text-red-600 mb-2 flex items-center gap-2">
-                <AlertCircle /> Reset All Data
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to reset all data? This will clear your custom blocks, holidays, and setup parameters. This action cannot be undone.
-              </p>
-              <div className="flex justify-end gap-3">
-                <button 
-                  onClick={() => setShowResetConfirm(false)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg font-bold transition-colors"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={() => {
-                    localStorage.clear();
-                    window.location.reload();
-                  }}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-colors"
-                >
-                  Yes, Reset Data
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <style dangerouslySetInnerHTML={{ __html: `
         .no-scrollbar::-webkit-scrollbar { display: none; }
